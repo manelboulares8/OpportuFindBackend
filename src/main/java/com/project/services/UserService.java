@@ -33,12 +33,22 @@ public class UserService implements UserDetailsService {
 
     // Register Etudiant
     public Etudiant registerEtudiant(Etudiant etudiant) {
+        // Check if email already exists
+        if (etudiantRepository.findByEmail(etudiant.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email is already in use");
+        }
+        
         etudiant.setPassword(passwordEncoder.encode(etudiant.getPassword())); // Hash password
         return etudiantRepository.save(etudiant);
     }
 
     // Register Entrepreneur
     public Entrepreneur registerEntrepreneur(Entrepreneur entrepreneur) {
+        // Check if email already exists
+        if (entrepreneurRepository.findByEmail(entrepreneur.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email is already in use");
+        }
+        
         entrepreneur.setPassword(passwordEncoder.encode(entrepreneur.getPassword())); // Hash password
         return entrepreneurRepository.save(entrepreneur);
     }

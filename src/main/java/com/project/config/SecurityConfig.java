@@ -35,6 +35,16 @@ public class SecurityConfig {
             .anyRequest().permitAll();
         return http.build();
     }
+    @Bean
+    public org.springframework.web.filter.CorsFilter corsFilter() {
+        org.springframework.web.cors.CorsConfiguration corsConfig = new org.springframework.web.cors.CorsConfiguration();
+        corsConfig.setAllowedOrigins(java.util.Collections.singletonList("http://localhost:4200"));
+        corsConfig.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE"));
+        corsConfig.setAllowedHeaders(java.util.Arrays.asList("Authorization", "Content-Type"));
+        org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfig);
+        return new org.springframework.web.filter.CorsFilter(source);
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {

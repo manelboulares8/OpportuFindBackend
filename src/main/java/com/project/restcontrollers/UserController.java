@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin(origins = "http://localhost:4200") // Allow requests from Angular app
+
 public class UserController {
 
     private final UserService userService;
