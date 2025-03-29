@@ -23,13 +23,15 @@ public class JwtService {
      *
      * @param email L'email de l'utilisateur (sujet du token).
      * @param role  Le rôle de l'utilisateur (ex: ROLE_ENTREPRENEUR, ROLE_ETUDIANT).
+     * @param id    L'ID de l'utilisateur (ex: ID de l'entrepreneur).
      * @return Le token JWT généré.
      */
-    public String generateToken(String email, String role) {
+    public String generateToken(String email, String role, long id) {
         try {
             return JWT.create()
                     .withSubject(email) // L'email est le sujet du token
                     .withClaim("role", role) // Ajoute le rôle comme une "claim"
+                    .withClaim("id", id) // Ajoute l'id comme une "claim"
                     .withIssuedAt(new Date()) // Date de création du token
                     .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // Date d'expiration
                     .sign(Algorithm.HMAC256(SECRET_KEY)); // Signature avec la clé secrète
@@ -71,6 +73,25 @@ public class JwtService {
                     .verify(token); // Vérifie le token
 
             return decodedJWT.getClaim("role").asString(); // Extrait le rôle
+        } catch (JWTVerificationException exception) {
+            throw new JWTVerificationException("Invalid or expired token", exception);
+        }
+    }
+
+    /**
+     * Extrait l'ID d'un token JWT.
+     *
+     * @param token Le token JWT.
+     * @return L'ID extrait du token.
+     * @throws JWTVerificationException Si le token est invalide.
+     */
+    public long extractId(String token) throws JWTVerificationException {
+        try {
+            DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC256(SECRET_KEY))
+                    .build()
+                    .verify(token); // Vérifie le token
+
+            return decodedJWT.getClaim("id").asLong(); // Extrait l'ID
         } catch (JWTVerificationException exception) {
             throw new JWTVerificationException("Invalid or expired token", exception);
         }

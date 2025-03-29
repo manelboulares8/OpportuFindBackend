@@ -30,6 +30,8 @@ public class SecurityConfig {
             .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeRequests()
             .requestMatchers("/api/auth/register/**").permitAll()  
+            .requestMatchers("/api/offres/**").permitAll()
+            .requestMatchers("/api/entrepreneurs/**").permitAll()
             .requestMatchers("/api/auth/login/**").permitAll() // This allows registration without authentication
             .requestMatchers("/api/**").authenticated()  // Only authenticated users can access other APIs
             .anyRequest().permitAll();

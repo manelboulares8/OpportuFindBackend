@@ -61,28 +61,52 @@ public class UserService implements UserDetailsService {
         // Verify password using PasswordEncoder
         if (passwordEncoder.matches(password, userDetails.getPassword())) {
             // Determine the role of the user (Etudiant or Entrepreneur)
-            String role = userDetails instanceof Etudiant ? "ROLE_ETUDIANT" : "ROLE_ENTREPRENEUR";
-            
-            // If valid, generate JWT token
-            return jwtService.generateToken(userDetails.getUsername(), role); // Pass email and role
+            String role;
+            long userId;
+
+            if (userDetails instanceof Etudiant) {
+                role = "ROLE_ETUDIANT";
+                userId = ((Etudiant) userDetails).getIdEtudiant(); // Get ID from Etudiant
+            } else if (userDetails instanceof Entrepreneur) {
+                role = "ROLE_ENTREPRENEUR";
+                userId = ((Entrepreneur) userDetails).getIdEntrepreneur(); // Get ID from Entrepreneur
+            } else {
+                throw new UsernameNotFoundException("User not found with email: " + email);
+            }
+
+            // If valid, generate JWT token with email, role, and id
+            return jwtService.generateToken(userDetails.getUsername(), role, userId); // Pass email, role, and id
         } else {
             throw new UsernameNotFoundException("Invalid credentials");
         }
     }
 
 
+    
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        // Check if the user is an Etudiant
         Optional<Etudiant> etudiant = etudiantRepository.findByEmail(email);
         if (etudiant.isPresent()) {
-            return etudiant.get();
+            Etudiant foundEtudiant = etudiant.get();
+            // You can access the ID here
+            long userId = foundEtudiant.getIdEtudiant(); // Assuming Etudiant has getId() method
+            // You can then use the userId as needed, or pass it along with the userDetails
+            return foundEtudiant;
         }
 
+        // Check if the user is an Entrepreneur
         Optional<Entrepreneur> entrepreneur = entrepreneurRepository.findByEmail(email);
         if (entrepreneur.isPresent()) {
-            return entrepreneur.get();
+            Entrepreneur foundEntrepreneur = entrepreneur.get();
+            // Access the ID of the entrepreneur
+            long userId = foundEntrepreneur.getIdEntrepreneur(); // Assuming Entrepreneur has getId() method
+            // You can then use the userId as needed, or pass it along with the userDetails
+            return foundEntrepreneur;
         }
 
+        // If no user was found, throw exception
         throw new UsernameNotFoundException("User not found with email: " + email);
     }
+
 }
