@@ -19,8 +19,22 @@ public class EtudiantServicesImpl implements EtudiantServices {
     }
 
     @Override
-    public Etudiant updateEtudiant(Etudiant e) {
-        return etudiantRepository.save(e);
+    public Etudiant updateEtudiant(Etudiant etudiant) {
+        // Find the existing student
+        Etudiant existingEtudiant = etudiantRepository.findById(etudiant.getIdEtudiant())
+            .orElseThrow(() -> new RuntimeException("Student not found with id: " + etudiant.getIdEtudiant()));
+        
+        // Update the fields you want to allow to be updated
+        existingEtudiant.setFullName(etudiant.getFullName());
+        existingEtudiant.setEmail(etudiant.getEmail());
+        existingEtudiant.setUniversity(etudiant.getUniversity());
+        existingEtudiant.setParcours(etudiant.getParcours());
+        existingEtudiant.setCvUrl(etudiant.getCvUrl());
+        
+        // Note: You might not want to update email or password here
+        // as they might require special handling
+        
+        return etudiantRepository.save(existingEtudiant);
     }
 
     @Override

@@ -13,7 +13,7 @@ import com.project.entities.Etudiant;
 import com.project.services.EtudiantServices;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/etudiants")
 @CrossOrigin
 
 public class EtudiantRestController {

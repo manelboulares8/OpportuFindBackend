@@ -27,7 +27,18 @@ public class EntrepreneurServices {
     }
     
     public Entrepreneur updateEntrepreneur(Entrepreneur entrepreneur) {
-        return entrepreneurRepository.save(entrepreneur);
+        // Find the existing entrepreneur
+        Entrepreneur existingEntrepreneur = entrepreneurRepository.findById(entrepreneur.getIdEntrepreneur())
+            .orElseThrow(() -> new RuntimeException("Entrepreneur not found with id: " + entrepreneur.getIdEntrepreneur()));
+        
+        // Update all fields from the request
+        existingEntrepreneur.setFullName(entrepreneur.getFullName());
+        existingEntrepreneur.setEmail(entrepreneur.getEmail());
+        existingEntrepreneur.setLocalisation(entrepreneur.getLocalisation());
+        existingEntrepreneur.setSecteur(entrepreneur.getSecteur());
+        existingEntrepreneur.setAboutUs(entrepreneur.getAboutUs());
+        
+        return entrepreneurRepository.save(existingEntrepreneur);
     }
     
     public void deleteEntrepreneurById(Long idEntrepreneur) {
