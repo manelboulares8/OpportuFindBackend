@@ -1,16 +1,20 @@
 package com.project.entities;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Etudiant implements UserDetails  {
@@ -26,6 +30,10 @@ public class Etudiant implements UserDetails  {
     
     @Column(nullable = false)
     private String password;
+    
+    @OneToMany(mappedBy = "etudiant", cascade = CascadeType.ALL)
+    private List<Candidature> candidatures = new ArrayList<>();
+
 
     public Etudiant(String fullName, String email, String university, String parcours, String cvUrl,
                     String password) {

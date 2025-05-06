@@ -1,7 +1,13 @@
 package com.project.entities;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 public class Offre {
@@ -21,6 +27,12 @@ public class Offre {
 
     @Temporal(TemporalType.DATE)
     private Date date;
+    
+    @OneToMany(mappedBy = "offre", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    @JsonIgnore
+    private List<Candidature> candidatures = new ArrayList<>();
+
 
     public Offre(Long idOffre, String titre, String localisation, String exigences, String description,
 			Entrepreneur entrepreneur, Date date) {
@@ -97,5 +109,12 @@ public class Offre {
     }
     public Long getEntrepreneurId() {
         return entrepreneur != null ? entrepreneur.getIdEntrepreneur() : null;
+    }
+    public List<Candidature> getCandidatures() {
+        return candidatures;
+    }
+
+    public void setCandidatures(List<Candidature> candidatures) {
+        this.candidatures = candidatures;
     }
 }

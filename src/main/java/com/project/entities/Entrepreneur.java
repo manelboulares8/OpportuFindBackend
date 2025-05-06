@@ -1,16 +1,23 @@
 package com.project.entities;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Entrepreneur implements UserDetails{
@@ -26,6 +33,11 @@ public class Entrepreneur implements UserDetails{
     private String localisation;
     private String secteur;
     private String aboutUs;
+    @OneToMany(mappedBy = "entrepreneur", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    @JsonIgnore
+    private List<Offre> offres = new ArrayList<>();
+
 
     @Override
     public String toString() {
@@ -87,6 +99,13 @@ public class Entrepreneur implements UserDetails{
 
     public void setAboutUs(String aboutUs) {
         this.aboutUs = aboutUs;
+    }
+    public List<Offre> getOffres() {
+        return offres;
+    }
+
+    public void setOffres(List<Offre> offres) {
+        this.offres = offres;
     }
 
     public Entrepreneur() {

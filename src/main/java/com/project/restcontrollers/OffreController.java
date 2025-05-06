@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/offres")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4200") // Your Angular app URL
 public class OffreController {
 
     @Autowired
