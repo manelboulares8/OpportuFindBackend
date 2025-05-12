@@ -34,7 +34,8 @@ public class SecurityConfig {
             .requestMatchers("/api/entrepreneurs/**").permitAll()
             .requestMatchers("/api/etudiants/**").permitAll()
             .requestMatchers("/api/auth/login/**").permitAll() 
-            .requestMatchers("/api/candidatures/**").permitAll() // This allows registration without authentication
+            .requestMatchers("/api/candidatures/**").permitAll()
+            .requestMatchers("/api/admin/dashboard/**").permitAll()// This allows registration without authentication
             .requestMatchers("/api/**").authenticated()  // Only authenticated users can access other APIs
             .anyRequest().permitAll();
         return http.build();
@@ -43,7 +44,7 @@ public class SecurityConfig {
     public org.springframework.web.filter.CorsFilter corsFilter() {
         org.springframework.web.cors.CorsConfiguration corsConfig = new org.springframework.web.cors.CorsConfiguration();
         corsConfig.setAllowedOrigins(java.util.Collections.singletonList("http://localhost:4200"));
-        corsConfig.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE"));
+        corsConfig.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE","OPTIONS"));
         corsConfig.setAllowedHeaders(java.util.Arrays.asList("Authorization", "Content-Type"));
         org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfig);

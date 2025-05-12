@@ -5,12 +5,21 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.project.repositories.EtudiantRepository;
 import com.project.repositories.EntrepreneurRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.entities.Entrepreneur;
 import com.project.entities.Etudiant;
 import com.project.services.JwtService;  // Import JwtService
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 
 @Service
@@ -108,5 +117,33 @@ public class UserService implements UserDetailsService {
         // If no user was found, throw exception
         throw new UsernameNotFoundException("User not found with email: " + email);
     }
+    public Etudiant registerEtudiantWithCv(String etudiantJson, MultipartFile file) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Etudiant etudiant = objectMapper.readValue(etudiantJson, Etudiant.class);
+
+        if (etudiantRepository.findByEmail(etudiant.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email is already in use");
+        }
+
+        etudiant.setPassword(passwordEncoder.encode(etudiant.getPassword()));
+        Etudiant savedEtudiant = etudiantRepository.save(etudiant);
+
+        if (!file.isEmpty()) {
+            String fileName = System.currentTimeMillis() + "_" + StringUtils.cleanPath(file.getOriginalFilename());
+            Path uploadPath = Paths.get("uploads");
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            Path filePath = uploadPath.resolve(fileName);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            savedEtudiant.setCvUrl(fileName);
+            savedEtudiant = etudiantRepository.save(savedEtudiant);  // Save again with file info
+        }
+
+        return savedEtudiant;
+    }
+
 
 }

@@ -13,7 +13,11 @@ import java.util.Optional;
 public class CandidatureService {
 
     @Autowired
+    private EmailService emailService;
+
+    @Autowired
     private CandidatureRepository candidatureRepository;
+    
 
     public List<Candidature> getAllCandidatures() {
         return candidatureRepository.findAll();
@@ -30,7 +34,7 @@ public class CandidatureService {
     public void deleteCandidature(Long id) {
         candidatureRepository.deleteById(id);
     }
-
+/*
     public Candidature updateCandidatureStatus(Long id, String status, LocalDateTime recruitmentDateTime) {
         Optional<Candidature> optionalCandidature = candidatureRepository.findById(id);
         
@@ -48,7 +52,39 @@ public class CandidatureService {
         } else {
             throw new RuntimeException("Candidature not found with id " + id);
         }
+    }*/
+    public Candidature updateCandidatureStatus(Long id, String status, LocalDateTime recruitmentDateTime) {
+        Optional<Candidature> optionalCandidature = candidatureRepository.findById(id);
+
+        if (optionalCandidature.isPresent()) {
+            Candidature candidature = optionalCandidature.get();
+            candidature.setStatus(status);
+
+            if ("ACCEPTED".equalsIgnoreCase(status)) {
+                candidature.setRecruitmentDate(recruitmentDateTime != null ? recruitmentDateTime : LocalDateTime.now());
+            } else {
+                candidature.setRecruitmentDate(null); // efface la date si non accepté
+            }
+
+            candidatureRepository.save(candidature);
+
+            // Supposons que Candidature a une relation avec Offre et Candidat -> Utilisateur -> Email
+            String offerName = candidature.getOffre().getTitre(); // ou getJobPost().getTitle() selon ton modèle
+            String email = candidature.getEtudiant().getEmail();
+
+            emailService.sendRecruitmentResult(
+                email,
+                status,
+                candidature.getRecruitmentDate() != null ? candidature.getRecruitmentDate().toString() : "",
+                offerName
+            );
+
+            return candidature;
+        } else {
+            throw new RuntimeException("Candidature not found with id " + id);
+        }
     }
+
 
 
     public List<Candidature> getCandidaturesByEtudiantId(Long etudiantId) {

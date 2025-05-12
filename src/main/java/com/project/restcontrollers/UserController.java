@@ -4,7 +4,13 @@ import com.project.entities.Entrepreneur;
 import com.project.entities.Etudiant;
 import com.project.services.JwtService;
 import com.project.services.UserService;
+
+import java.io.IOException;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/auth")
@@ -36,4 +42,20 @@ public class UserController {
         String token = userService.login(email, password);
         return token;
     }
+    @RequestMapping(method = RequestMethod.POST, consumes = {"multipart/form-data"})
+    public ResponseEntity<?> createEtudiantWithCv(
+        @RequestParam("etudiant") String etudiantJson,
+        @RequestParam("file") MultipartFile file
+    ) {
+        try {
+            Etudiant savedEtudiant = userService.registerEtudiantWithCv(etudiantJson, file);
+            return ResponseEntity.ok(savedEtudiant);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
 }

@@ -15,4 +15,13 @@ public interface CandidatureRepository extends JpaRepository<Candidature, Long> 
 	    List<Candidature> findCandidaturesByEntrepreneurId(@Param("entrepreneurId") Long entrepreneurId);  
 	 @Query("SELECT c FROM Candidature c WHERE c.etudiant.idEtudiant = :etudiantId")
 	    List<Candidature> findCandidaturesByEtudiantId(@Param("etudiantId") Long etudiantId);
+	 
+	 @Query("SELECT COUNT(c) FROM Candidature c WHERE c.status = :status")
+	    long countByStatus(@Param("status") String status);
+	    
+	    @Query("SELECT c.offre.entrepreneur.secteur, COUNT(c) FROM Candidature c GROUP BY c.offre.entrepreneur.secteur")
+	    List<Object[]> countCandidaturesBySecteur();
+	    
+	    @Query("SELECT FUNCTION('DATE', c.recruitmentDate), COUNT(c) FROM Candidature c WHERE c.status = 'ACCEPTED' GROUP BY FUNCTION('DATE', c.recruitmentDate)")
+	    List<Object[]> countAcceptedCandidaturesByDate();
 }
